@@ -1,4 +1,4 @@
-# Wildfire Dashboard — โครงการรายวิชา DSI324
+# โครงการรายวิชา DSI324 Wildfire Dashboard
 
 ## Project Overview
 
@@ -27,7 +27,7 @@
 
 ### 3. Dataset Quality
 
-| เงื่อนไข                              | ทำได้? | หมายเหตุ |
+| Requirement                          | Met? | Notes |
 |--------------------------------------|--------|----------|
 | จำนวน record ≥ 1,000                 | ✔️     | เก็บข้อมูลทุก 15 นาที ผ่าน Prefect รวมมากกว่า 96 records/วัน |
 | ครอบคลุมเวลา ≥ 24 ชั่วโมง           | ✔️     | ดึงข้อมูลแบบ schedule รายวันอัตโนมัติ |
@@ -68,7 +68,7 @@
 
 ## Tools
 
-| ส่วนงาน             | เทคโนโลยีที่ใช้                  |
+| Component             | Tools                  |
 |---------------------|-----------------------------------|
 | Ingestion           | Prefect                           |
 | Storage             | LakeFS + Parquet                  |
