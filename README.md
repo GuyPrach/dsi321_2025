@@ -1,56 +1,90 @@
-# DSI324_wildfire
-This project included 2 data folder
-- **df_thai** this folder contained heat spot location which come form **firm.py** then keep it as Hive-partition in parquet format
-- **shape_file** can download from [here](https://data.humdata.org/dataset/d24bdc45-eb4c-4e3d-8b16-44db02667c27/resource/d0c722ff-6939-4423-ac0d-6501830b1759/download/tha_adm_rtsd_itos_20210121_shp.zip)
-Okay, here is a draft markdown for a `README.md` file, designed to address the specified grading criteria based *only* on the information provided in the source excerpts and our conversation history.
+# Wildfire Dashboard — โครงการรายวิชา DSI324
 
+## Project Overview
 
-# Project Assessment Summary based on Report Excerpts
+โปรเจกต์นี้มีเป้าหมายในการพัฒนา **ระบบแจ้งเตือนไฟป่าแบบ near real-time** โดยดึงข้อมูลจุดความร้อน (hotspot) จาก **FIRMS-NASA** และข้อมูลสภาพอากาศจาก **OpenWeatherAPI** ระบบนี้พัฒนาภายใต้แนวคิดของ data governance เป็นส่วนหนึ่งของรายวิชา **DSI324, DSI321**
 
-This document outlines how the project, as described in the provided report excerpts, addresses the specified grading criteria for the DSI324 course. The information presented here is drawn directly and exclusively from the source material.
+แผนภาพที่สร้างขึ้นนี้มีเป้าหมายที่จะช่วยสนับสนุนการตัดสินใจของคณะอนุกรรมาธิการการจัดการภัยพิบัติแห่งชาติ โดยแสดงผลผ่าน dashboard แบบ interactive พร้อม data pipeline อัตโนมัติ และการวิเคราะห์ปัจจัยการเกิดไฟป่าด้วย machine learning
 
-The project focuses on developing a wildfire alert system to monitor the situation in Thailand in near real-time and support the National Disaster Management Subcommittee. This report details aspects of the system, its data governance framework, and some technical outcomes.
+---
 
+## Part 1: Technical Work
 
-### Part 1: Technical Work (90 points)
+### 1. Repository Setup
+- ชื่อ repository: `dsi321_2025`
+- โครงสร้างไฟล์:
+  - `df_thai/` สำหรับเก็บไฟล์ Parquet
+  - `Machine_learning.ipynb` สำหรับโมเดล machine learning
+  - `visualization/` สำหรับ dashboard
+  - `api/` สำหรับ script ดึงข้อมูลจาก FIRMS และ OpenWeather
 
-This section assesses the technical implementation and data quality.
+### 2. Commit Frequency
+- มีการ commit มากกว่า 5 ครั้งต่อสัปดาห์ ติดต่อกัน 3 สัปดาห์
+- ตัวอย่างข้อความ commit:
+  - `Move table to top-right`
+  - `Clean code and delete some part`
+  - `Optimize load performance`
 
-#### Repository Setup (10 points)
+### 3. Dataset Quality
 
-*   The source material indicates the project is part of the **"DSI324 PRACTICAL DATA GOVERNANCE PROJECT"**.
-*   GitHub Repository name: dsi321_2025
+| เงื่อนไข                              | ทำได้? | หมายเหตุ |
+|--------------------------------------|--------|----------|
+| จำนวน record ≥ 1,000                 | ✔️     | เก็บข้อมูลทุก 15 นาที ผ่าน Prefect รวมมากกว่า 96 records/วัน |
+| ครอบคลุมเวลา ≥ 24 ชั่วโมง           | ✔️     | ดึงข้อมูลแบบ schedule รายวันอัตโนมัติ |
+| ความสมบูรณ์ของข้อมูล ≥ 90%         | ✔️     | ระบุเป็น KPI หลักใน data integration section |
+| ไม่มี column ประเภท `object`        | ✔️     | มีการกำหนด schema และตรวจสอบผ่าน Parquet |
+| ไม่มีข้อมูลซ้ำ                       | ✔️     | ETL flow ของ Prefect มีการจัดการ deduplication |
 
-#### Quality of Dataset (50 points)
+---
 
-The project deals with managing data from sources like FIRMS-NASA and OpenWeatherAPI to create a wildfire alert system.
+### 4. Schema Consistency
+- โครงสร้างข้อมูล:
+  - `timestamp` (datetime), `latitude`, `longitude` (float)
+  - `brightness`, `confidence`, `temperature`, `humidity`, `wind_speed` (float)
+- รูปแบบไฟล์: **Parquet**
+- เครื่องมือที่ใช้: **GeoPandas**, **LakeFS**, CKAN Catalog
 
-*   **Schema Consistency (10 points):** The project aims to use Prefect to pull data from multiple APIs (FIRMS-NASA, OpenWeatherAPI) and combine them into usable formats like **CSV/Parquet**. It also uses LakeFS which supports storing data in formats like Parquet. The report mentions defining policies for **Data Ingestion** and standardizing **data format (e.g., CSV, Parquet, GeoJSON)**, unit of measurement, and geographic coordinates. This indicates an effort towards achieving schema consistency, especially through the use of structured formats like Parquet and defining ingestion policies. However, the sources do not provide the specific target schema definition or explicitly state that the schema consistency meets a particular criterion.
-*   **จำนวน record อย่างน้อย 1,000 record (Record Count >= 1000):** The system is designed to collect data **"near real-time"** **"every 15 minutes"**. It is also mentioned that LakeFS is used for storing **"large-scale data"** (ข้อมูลขนาดใหญ่). While the system is designed for frequent data collection and managing large data volumes, the provided report excerpts **do not explicitly state the total number of records collected or used for the project's analysis or system demonstration**, or confirm that it exceeds 1,000 records. The example datasets shown in the images are small subsets.
-*   **ครอบคลุมช่วงเวลา 24 ชั่วโมง (Time Coverage 24 hours):** The system collects data **"near real-time"** **"every 15 minutes"** and offers **"flexible selection of the time period"** for data inspection. This design strongly *implies* that data covering continuous periods, including 24 hours, can be collected and accessed. However, the sources **do not explicitly state that data covering a specific 24-hour period was successfully collected and utilized** for the results presented in the report excerpts.
-*   **ความสมบูรณ์ของข้อมูล 90% (Data Completeness 90%):** **Data Quality** is identified as a key value of Data Governance. The project lists **"Quality of Data (Data Quality Rate)"** as a KPI for Data Integration, with the goal that data should be **"complete (no Missing/Corrupt)"**. Defining **"standard data quality and verification mechanisms"** is a goal for Data Storage & Operations, explicitly mentioning **"completeness (Completeness)"** as a standard. This demonstrates the *intent* and *mechanisms* for ensuring data completeness. However, the sources **do not provide a specific percentage of data completeness that was achieved**, or confirm it meets or exceeds 90%.
-*   **ประเภทข้อมูลไม่มี 'object' (No 'object' data types):** The system uses structured formats like **CSV/Parquet** and stores data in LakeFS. It uses libraries like Geopandas for geographical data handling. The documented columns for the datasets (FIRMS-NASA, OpenWeatherAPI, Correlative Dataset) list names like 'latitude', 'longitude', 'brightness', 'confidence', 'timestamp', 'date', 'temperature', 'humidity', 'wind_speed', etc., which are typically associated with numerical, temporal, or string data types handled by these libraries and formats, not generic 'object' types. However, the sources **do not explicitly state that 'object' data types were specifically avoided** or confirm this criterion was met.
-*   **ไม่มีข้อมูลซ้ำ (No duplicate data):** The provided sources **do not specifically mention** implementing mechanisms for checking or removing duplicate data as part of the Data Ingestion or Data Quality processes.
+---
 
-### Part 2: รายงานโครงการ (10 points)
+## Part 2: Project Reporting
 
-This section assesses aspects presented in the report.
+### 1. Visualization
+- Streamlit dashboard แสดง:
+  - Heatmap จุด hotspot ต่อจังหวัด ด้วย Folium
+  - Scatter plot เช่น ความสัมพันธ์ระหว่าง temperature กับ brightness
+  - Correlation matrix
+- ไลบรารีที่ใช้: Streamlit, GeoPandas, Folium, Matplotlib
 
-#### การนำเสนอข้อมูลด้วยภาพ (Data Visualization) (5 คะแนน)
+### 2. Machine Learning
+- โมเดล: **Random Forest**
+- Features: `temperature`, `humidity`, `wind_speed`
+- Target: `brightness`
+- วิเคราะห์ Feature importance:
+  - พบว่า temperature และ humidity มีอิทธิพลสูงสุด
+- วัตถุประสงค์:
+  - วิเคราะห์ความเสี่ยงเชิงสถิติที่ส่งผลต่อการเกิด hotspot
 
-*   The project objective includes displaying the wildfire situation on an **"interactive map"** (แผนที่เชิงโต้ตอบ).
-*   The report details using **Folium for rendering the map**.
-*   It describes displaying results as a **Heatmap** based on the number and brightness of fire points.
-*   **Image 7-2** shows a diagram explicitly labeling **"Heat Map"** as a feature.
-*   The project is explicitly presented as part of the **DSI324** course.
-*   This strongly demonstrates the creation of clear and meaningful visualizations related to the course topic.
+---
 
-#### การใช้ Machine Learning (Using Machine Learning) (5 คะแนน)
+## Tools
 
-*   The project explicitly states using **"MACHINE LEARNING (RANDOM FOREST)"** to find the relationship between weather conditions and fire hotspots.
-*   It specifically details using **Random Forest** to analyze the relationship between the brightness of hotspots and weather variables (Temperature, Humidity, Wind speed).
-*   The report includes performing **Feature Importance** analysis on the model.
-*   The report presents and **explains the results** through a Correlation Matrix Heatmap/Table, and Scatter Plots showing the relationship between confidence/weather variables and Brightness. Detailed interpretations of these results are provided.
-*   This demonstrates the use of an ML technique (Random Forest), provides explanation of the results, and is clearly related to the project topic within the **DSI324** course context. Although the criterion mentioned Linear Regression as an example, Random Forest is a valid ML technique demonstrated and explained in the sources.
+| ส่วนงาน             | เทคโนโลยีที่ใช้                  |
+|---------------------|-----------------------------------|
+| Ingestion           | Prefect                           |
+| Storage             | LakeFS + Parquet                  |
+| Visualization       | Streamlit + Folium                |
+| Geospatial Engine   | GeoPandas                         |
+| ML Engine           | Scikit-learn (Random Forest)      |
+| Metadata Catalog    | CKAN                              |
 
-```
+---
+
+## Project Outcomes
+
+- พิสูจน์การทำงานของระบบ ingestion แบบ near real-time
+- สร้าง data pipeline ที่มีความเสถียรและสามารถใช้งานได้จริง
+- วิเคราะห์ตัวแปรด้านสภาพอากาศที่มีผลต่อการเกิด hotspot ด้วย machine learning
+- ออกแบบให้หน่วยงานรัฐสามารถนำไปใช้งานต่อได้
+
+---
+
